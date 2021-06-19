@@ -1,0 +1,62 @@
+name: "Release"
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "The version you want to release. E.g.: 0.0.1"
+        required: true
+
+jobs:
+  release:
+    name: "New release"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Create release branch
+        run: git checkout -b release/${{ github.event.inputs.version }}
+
+      - name: Update changelog
+        uses: thomaseizinger/keep-a-changelog-new-release@1.1.0
+        with:
+          version: ${{ github.event.inputs.version }}
+
+      # In order to make a commit, we need to initialize a user.
+      # You may choose to write something less generic here if you want, it doesn't matter functionality wise.
+      - name: Initialize mandatory git config
+        run: |
+          git config user.name "GitHub actions"
+          git config user.email noreply@github.com
+
+      # This step will differ depending on your project setup
+      # Fortunately, yarn has a built-in command for doing this!
+      - name: Bump version in package.json
+        run: npm version ${{ github.event.inputs.version }}
+
+      - name: Commit changelog and manifest files
+        id: make-commit
+        run: |
+          git add CHANGELOG.md package.json package-lock.json
+          git commit --message "Release v${{ github.event.inputs.version }}"
+
+          echo "::set-output name=commit::$(git rev-parse HEAD)"
+
+      - name: Create tag
+        run: |
+          git tag v${{ github.event.inputs.version }}
+          git push origin v${{ github.event.inputs.version }}
+
+      - name: Merge release into main
+        run: |
+          git checkout main
+          git merge release/v${{ github.event.inputs.version }}
+
+      - name: Update develop branch
+        run: |
+          git checkout develop
+          git merge master
+          npm version ${{ github.event.inputs.version }}-SNAPSHOT
+          git add package.json package-lock.json
+          git commit -m "Set version to ${{ github.event.inputs.version }}-SNAPSHOT"
+          git push origin develop
