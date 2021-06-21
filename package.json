@@ -1,6 +1,6 @@
 {
   "name": "vue-3-tv-and-popcorn",
-  "version": "0.0.0",
+  "version": "1.0.0-SNAPSHOT",
   "private": true,
   "scripts": {
     "start": "vue-cli-service serve",

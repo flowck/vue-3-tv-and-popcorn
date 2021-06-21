@@ -3,9 +3,14 @@ name: "Release"
 on:
   workflow_dispatch:
     inputs:
-      version:
+      releaseVersion:
         description: "The version you want to release. E.g.: 0.0.1"
         required: true
+        default: 0.0.0
+      nextDevelopmentVersion:
+        description: "The next development version. E.g.: 0.0.1-SNAPSHOT"
+        required: true
+        default: "0.x.x-SNAPSHOT"
 
 jobs:
   release:
@@ -13,9 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - name: Create release branch
-        run: git checkout -b release/${{ github.event.inputs.version }}
+        with:
+          ref: develop
+          fetch-depth: 0
+          
+      - name: Prepare
+        run: git fetch --all
 
       # In order to make a commit, we need to initialize a user.
       # You may choose to write something less generic here if you want, it doesn't matter functionality wise.
@@ -24,22 +32,35 @@ jobs:
           git config user.name "GitHub actions"
           git config user.email noreply@github.com
 
-      # This step will differ depending on your project setup
-      # Fortunately, yarn has a built-in command for doing this!
+      - name: Create release branch
+        run: git checkout -b release/${{ github.event.inputs.releaseVersion }}
+
       - name: Bump version in package.json
-        run: npm version ${{ github.event.inputs.version }}
+        run: npm version ${{ github.event.inputs.releaseVersion }}
+
+      - name: Preparing main branch
+        run: |
+          git branch -a
+          git config pull.rebase true
+          git checkout -b main origin/main
+          git clean -fd
+          git pull origin main --allow-unrelated-histories
 
       - name: Merge release into main
         run: |
-          git fetch --all
-          git branch -a
-          git pull origin main --allow-unrelated-histories
-          git checkout main origin/main
-          git merge -s theirs release/${{ github.event.inputs.version }}
+          git merge release/${{ github.event.inputs.releaseVersion }}
 
       - name: Update develop branch
         run: |
           git checkout develop
-          git merge -s theirs master
-          npm version ${{ github.event.inputs.version }}-SNAPSHOT --git-tag-version false
+          git clean -fd
+          git merge main --allow-unrelated-histories
+          npm version ${{ github.event.inputs.nextDevelopmentVersion }} --git-tag-version false
+          git add .
+          git commit -m "Post-release: Set version to ${{ github.event.inputs.nextDevelopmentVersion }}"
+
+      - name: Push tag, and update develop and main
+        run: |
+          git push origin v${{ github.event.inputs.releaseVersion }}
           git push origin develop
+          git push origin main
