@@ -8,6 +8,7 @@
   - Footer
   - Highlights
   - Media
+- Setup gitflow release with Github Actions (CI) and Vercel
 - Features
   - Show highlighted media (movies / tv shows)
   - View media details

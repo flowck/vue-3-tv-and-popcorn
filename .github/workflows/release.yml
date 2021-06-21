@@ -1,0 +1,66 @@
+name: "Release"
+
+on:
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: "The version you want to release. E.g.: 0.0.1"
+        required: true
+        default: 0.0.0
+      nextDevelopmentVersion:
+        description: "The next development version. E.g.: 0.0.1-SNAPSHOT"
+        required: true
+        default: "0.x.x-SNAPSHOT"
+
+jobs:
+  release:
+    name: "New release"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: develop
+          fetch-depth: 0
+          
+      - name: Prepare
+        run: git fetch --all
+
+      # In order to make a commit, we need to initialize a user.
+      # You may choose to write something less generic here if you want, it doesn't matter functionality wise.
+      - name: Initialize mandatory git config
+        run: |
+          git config user.name "GitHub actions"
+          git config user.email noreply@github.com
+
+      - name: Create release branch
+        run: git checkout -b release/${{ github.event.inputs.releaseVersion }}
+
+      - name: Bump version in package.json
+        run: npm version ${{ github.event.inputs.releaseVersion }}
+
+      - name: Preparing main branch
+        run: |
+          git branch -a
+          git config pull.rebase true
+          git checkout -b main origin/main
+          git clean -fd
+          git pull origin main --allow-unrelated-histories
+
+      - name: Merge release into main
+        run: |
+          git merge release/${{ github.event.inputs.releaseVersion }}
+
+      - name: Update develop branch
+        run: |
+          git checkout develop
+          git clean -fd
+          git merge main --allow-unrelated-histories
+          npm version ${{ github.event.inputs.nextDevelopmentVersion }} --git-tag-version false
+          git add .
+          git commit -m "Post-release: Set version to ${{ github.event.inputs.nextDevelopmentVersion }}"
+
+      - name: Push tag, and update develop and main
+        run: |
+          git push origin v${{ github.event.inputs.releaseVersion }}
+          git push origin develop
+          git push origin main
