@@ -47,7 +47,7 @@ jobs:
         run: |
           git checkout develop
           git clean -fd
-          git merge master
+          git merge master --allow-unrelated-histories
           npm version ${{ github.event.inputs.nextDevelopmentVersion }} --git-tag-version false
 
       - name: Push changes
