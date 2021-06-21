@@ -21,6 +21,7 @@ jobs:
       # You may choose to write something less generic here if you want, it doesn't matter functionality wise.
       - name: Initialize mandatory git config
         run: |
+          git flow init -d
           git config user.name "GitHub actions"
           git config user.email noreply@github.com
 
@@ -30,14 +31,17 @@ jobs:
       - name: Bump version in package.json
         run: npm version ${{ github.event.inputs.releaseVersion }}
 
-      - name: Merge release into main
+      - name: Preparing main branch
         run: |
           git fetch --all
           git branch -a
           git config pull.rebase true
           git checkout -b main origin/main
           git clean -fd
-          git pull origin main --allow-unrelated-histories
+          git pull -u origin main --allow-unrelated-histories
+
+      - name: Merge release into main
+        run: |
           git merge release/${{ github.event.inputs.releaseVersion }}
 
       - name: Update develop branch
