@@ -16,6 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: develop
+          fetch-depth: 0
+          
+      - name: Prepare
+        run: git fetch --all
 
       # In order to make a commit, we need to initialize a user.
       # You may choose to write something less generic here if you want, it doesn't matter functionality wise.
@@ -32,7 +38,6 @@ jobs:
 
       - name: Preparing main branch
         run: |
-          git fetch --all
           git branch -a
           git config pull.rebase true
           git checkout -b main origin/main
