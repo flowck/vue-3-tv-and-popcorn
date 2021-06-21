@@ -54,8 +54,10 @@ jobs:
           git clean -fd
           git merge main --allow-unrelated-histories
           npm version ${{ github.event.inputs.nextDevelopmentVersion }} --git-tag-version false
+          git add .
+          git commit -m "Post-release: Set version to ${{ github.event.inputs.nextDevelopmentVersion }}"
 
-      - name: Push changes
+      - name: Push tag, and update develop and main
         run: |
           git push origin v${{ github.event.inputs.releaseVersion }}
           git push origin develop
