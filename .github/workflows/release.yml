@@ -35,9 +35,9 @@ jobs:
           git fetch --all
           git branch -a
           git config pull.rebase true
-          git pull origin main --allow-unrelated-histories
+          git checkout -b main origin/main
           git clean -fd
-          git checkout main origin/main
+          git pull origin main --allow-unrelated-histories
           git merge release/${{ github.event.inputs.releaseVersion }}
 
       - name: Update develop branch
