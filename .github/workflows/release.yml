@@ -6,9 +6,11 @@ on:
       releaseVersion:
         description: "The version you want to release. E.g.: 0.0.1"
         required: true
+        default: 0.0.0
       nextDevelopmentVersion:
         description: "The next development version. E.g.: 0.0.1-SNAPSHOT"
         required: true
+        default: "0.x.x-SNAPSHOT"
 
 jobs:
   release:
