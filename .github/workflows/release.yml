@@ -37,7 +37,7 @@ jobs:
           git config pull.rebase true
           git checkout -b main origin/main
           git clean -fd
-          git pull -u origin main --allow-unrelated-histories
+          git pull origin main --allow-unrelated-histories
 
       - name: Merge release into main
         run: |
