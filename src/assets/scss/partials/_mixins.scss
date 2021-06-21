@@ -1,0 +1,8 @@
+@mixin app-grid {
+  width: 90%;
+  padding: 0 5%;
+}
+
+@mixin debug {
+  border: 1px solid red;
+}

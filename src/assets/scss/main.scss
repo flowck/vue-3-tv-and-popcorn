@@ -1,1 +1,18 @@
 @import "partials/reset";
+@import "partials/grid";
+
+body {
+  font-size: 14px;
+  color: $app-color-white;
+  background-color: $app-color-dark;
+}
+
+body,
+#app {
+  min-height: 100vh;
+}
+
+#app {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}

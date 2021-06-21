@@ -1,24 +1,26 @@
 <template>
-  <tv-header></tv-header>
-  <router-view />
-  <tv-footer></tv-footer>
+  <app-header />
+  <main class="app-views">
+    <router-view />
+  </main>
+  <app-footer />
 </template>
 
 <script lang="ts">
 import { mapActions } from "vuex";
-import TvHeader from "./components/tv-header.vue";
-import TvFooter from "./components/tv-footer.vue";
+import AppHeader from "./components/app-header.vue";
+import AppFooter from "./components/app-footer.vue";
 import { Vue, Options } from "vue-class-component";
 
 @Options({
-  components: { "tv-header": TvHeader, TvFooter },
+  components: { AppHeader, AppFooter },
   methods: { ...mapActions(["initApp"]) },
 })
 export default class App extends Vue {
   private initApp!: { (): void };
 
   mounted(): void {
-    this.initApp();
+    // this.initApp();
   }
 }
 </script>
@@ -26,7 +28,7 @@ export default class App extends Vue {
 <style lang="scss">
 @import "./assets/scss/main.scss";
 
-body {
-  font-family: $font-body;
+.app-views {
+  // @include debug;
 }
 </style>
