@@ -5,14 +5,18 @@
 </template>
 
 <script lang="ts">
-import { Vue, Options } from "vue-class-component";
+import { defineComponent } from "vue";
 
-@Options({})
-export default class AppFooter extends Vue {
-  get year(): number {
-    return new Date().getFullYear();
-  }
-}
+export default defineComponent({
+  computed: {
+    year(): number {
+      return new Date().getFullYear();
+    },
+  },
+  setup: (props) => {
+    console.log(props);
+  },
+});
 </script>
 
 <style lang="scss" scoped>

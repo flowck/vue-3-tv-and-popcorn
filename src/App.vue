@@ -20,7 +20,8 @@ export default class App extends Vue {
   private initApp!: { (): void };
 
   mounted(): void {
-    // this.initApp();
+    this.initApp();
+    console.log("HI");
   }
 }
 </script>

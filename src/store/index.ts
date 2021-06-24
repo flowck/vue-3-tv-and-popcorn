@@ -1,13 +1,17 @@
 import { showModule } from "./show";
 import { createStore } from "vuex";
 
-interface RootState {
+export interface RootState {
   id: string;
 }
 
 const state: RootState = {
   id: "",
 };
+
+export enum MODULES {
+  SHOW_MODULE = "showModule",
+}
 
 export default createStore({
   state,
